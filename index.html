@@ -200,7 +200,7 @@ mark{background:var(--notice-line);color:inherit;border-radius:3px;padding:0 1px
 <div class="wrap">
   <header class="top">
     <h1>가상계좌 · 증권발급</h1>
-    <p class="upd">제작·관리 <b>보람</b> · v0.3 (2026.11.02)</p>
+    <p class="upd">제작·관리 <b>보람</b> · v0.4 (2026.11.02)</p>
   </header>
   <section class="notices" id="notices" aria-label="공지사항"></section>
   <div class="controls">
@@ -486,8 +486,7 @@ let current=null, lastFocus=null;
 function wayHtml(w, sk, i){
   const steps = stepsOf(w);
   return `<div class="way" id="w-${sk}-${i}">
-    <div class="wh"><strong>${esc(w.label)}</strong>${w.pill?`<span class="pill">${esc(w.pill)}</span>`:""}
-      <button class="mini" type="button" data-w="${sk}:${i}">복사</button></div>
+    <div class="wh"><strong>${esc(w.label)}</strong>${w.pill?`<span class="pill">${esc(w.pill)}</span>`:""}</div>
     ${w.tel?`<div class="val"><a class="tel" href="tel:${w.tel.replace(/[^0-9]/g,"")}">${TEL}<span>${hl(w.tel)}</span></a></div>`:""}
     ${w.url?`<div class="val"><a class="url" href="${esc(w.url)}" target="_blank" rel="noopener">${hl(w.url)}</a></div>`:""}
     ${steps.length?`<ol class="steps">${steps.map(s=>`<li class="${HOT.test(s)?"hot":""}"><span>${hl(s)}</span></li>`).join("")}</ol>`:""}
