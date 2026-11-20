@@ -200,7 +200,7 @@ mark{background:var(--notice-line);color:inherit;border-radius:3px;padding:0 1px
 <div class="wrap">
   <header class="top">
     <h1>가상계좌 · 증권발급</h1>
-    <p class="upd">제작·관리 <b>보람</b> · v0.6 (2026.11.19)</p>
+    <p class="upd">제작·관리 <b>보람</b> · v0.7 (2026.11.20)</p>
   </header>
   <section class="notices" id="notices" aria-label="공지사항"></section>
   <div class="controls">
@@ -244,7 +244,8 @@ const CATS = [
   {id:"life",label:"생명보험"}
 ];
 
-const SECTIONS = [{key:"va",label:"가상계좌"},{key:"cert",label:"증권발행"}];
+const SECTIONS = [{key:"va",label:"가상계좌"},{key:"cert",label:"증권발행"},{key:"endo",label:"배서"}];
+const secsOf = it => SECTIONS.filter(s=>it[s.key]&&it[s.key].length);
 
 /* 회사별 처리 방법.
    way.steps : 시스템 메뉴 경로 (" > "로 구분)
@@ -267,7 +268,9 @@ const DETAIL = [
   va:[{label:"가상계좌 발급", pill:"가상계좌 고정",
     steps:"영업지원시스템 > 장기보험 > 계약관리 > 계약조회 > 계약상세조회 > 증권번호 입력 후 조회 > (하단) 입금+ > 가상계좌 > 은행 선택 > 계좌발급"}],
   cert:[{label:"증권 발행",
-    steps:"영업지원시스템 > 장기보험 > 계약관리 > 계약조회 > 계약상세조회 > 증권번호 입력 후 조회 > (하단) 기타+ > 보험증권 > 증권번호 조회 > 증권번호 앞 체크 > 본인동의 확인 체크 > 재발행사유 체크 > 하단 발행"}]},
+    steps:"영업지원시스템 > 장기보험 > 계약관리 > 계약조회 > 계약상세조회 > 증권번호 입력 후 조회 > (하단) 기타+ > 보험증권 > 증권번호 조회 > 증권번호 앞 체크 > 본인동의 확인 체크 > 재발행사유 체크 > 하단 발행"}],
+  endo:[{label:"카카오톡 채널", url:"http://pf.kakao.com/_xnyxhgn",
+    tip:"채널로 <b>배서 서류 보완</b> 및 배서 관련 문의 응대 가능"}]},
  {id:"hana-f", alias:"하나손보",
   va:[{label:"가상계좌 발급", pill:"1년 사용 가능",
     steps:"장기 > 조회 > 계약조회 > 계약상세조회 > 하단 가상계좌발급 > 은행 선택 > 발급"}],
@@ -379,14 +382,14 @@ const BASE = [{"id": "abl", "name": "ABL생명", "cat": "life", "alias": "에이
 const TODO = c => [{label:"고객센터 문의", tel:c, todo:true}];
 const ITEMS = BASE.map(b=>{
   const d = DETAIL.find(x=>x.id===b.id);
-  return {...b, alias:[b.alias,d&&d.alias||""].join(" "), va:(d&&d.va)||TODO(b.center), cert:(d&&d.cert)||TODO(b.center)};
+  return {...b, alias:[b.alias,d&&d.alias||""].join(" "), va:(d&&d.va)||TODO(b.center), cert:(d&&d.cert)||TODO(b.center), endo:(d&&d.endo)||[]};
 });
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const stripTags = s => String(s||"").replace(/<[^>]+>/g,"");
 const stepsOf = w => w.steps ? w.steps.split(" > ") : [];
-const hay = it => (it.name+" "+it.alias+" "+SECTIONS.flatMap(s=>it[s.key].map(w=>[w.label,w.steps,w.tel,w.url,w.pill,stripTags(w.tip)].join(" "))).join(" ")).toLowerCase();
+const hay = it => (it.name+" "+it.alias+" "+secsOf(it).flatMap(s=>it[s.key].map(w=>[w.label,w.steps,w.tel,w.url,w.pill,stripTags(w.tip)].join(" "))).join(" ")).toLowerCase();
 let cat = "all", q = "", favs = new Set();
 try{ cat = localStorage.getItem("va-cat") || "all"; }catch(e){}
 try{ favs = new Set(JSON.parse(localStorage.getItem("va-favs")||"[]")); }catch(e){}
@@ -498,7 +501,7 @@ function openSheet(id){
   $("#sMono").innerHTML=`<img src="${LOGOS[current.id]}" alt="">`;
   paintFav();
   $("#sTitle").innerHTML=`${esc(current.name)}<span class="sub">${CATS.find(c=>c.id===current.cat).label}</span>`;
-  $("#sBody").innerHTML = SECTIONS.map((s,si)=>`
+  $("#sBody").innerHTML = secsOf(current).map((s,si)=>`
     <section class="sec" id="s-${s.key}">
       <div class="sh"><span class="num">${si+1}</span><h3>${s.label}</h3>
         <button class="copy" type="button" data-s="${s.key}">복사</button></div>
@@ -533,7 +536,7 @@ $("#sBody").addEventListener("click",e=>{
     copyText(`[${current.name}] ${s.label}\n`+wayText(current[sk][+i]),w,$(`#w-${sk}-${i}`)); return; }
   const s=e.target.closest("[data-s]");
   if(s){ copyText(secText(current,SECTIONS.find(x=>x.key===s.dataset.s)),s,$(`#s-${s.dataset.s}`)); return; }
-  if(e.target.closest("#copyAll")) copyText(SECTIONS.map(x=>secText(current,x)).join("\n\n"),null,$("#sBody"));
+  if(e.target.closest("#copyAll")) copyText(secsOf(current).map(x=>secText(current,x)).join("\n\n"),null,$("#sBody"));
 });
 /* swipe down to close */
 let y0=null;
